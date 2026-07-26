@@ -48,12 +48,12 @@ try:
 except Exception as e:
     logger.warning(f"Could not mount static files: {e}")
 
-# Include routers
-app.include_router(health.router)
-app.include_router(cues.router)
-app.include_router(users.router)
-app.include_router(messages.router)
-app.include_router(admin.router)
+# Include routers under /api
+app.include_router(health.router, prefix="/api")
+app.include_router(cues.router, prefix="/api")
+app.include_router(users.router, prefix="/api")
+app.include_router(messages.router, prefix="/api")
+app.include_router(admin.router, prefix="/api")
 
 
 @app.get("/")

@@ -1,0 +1,70 @@
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+2026-07-26 10:42:01,459 - app.main - INFO - StageComms starting up...
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:56458 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39482 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34770 - "GET /health HTTP/1.1" 200 OK
+INFO:     192.168.0.6:41034 - "GET / HTTP/1.1" 200 OK
+INFO:     192.168.0.6:41046 - "GET /css/main.css HTTP/1.1" 200 OK
+INFO:     192.168.0.6:41060 - "GET /js/app.js HTTP/1.1" 200 OK
+INFO:     192.168.0.6:41064 - "GET /manifest.json HTTP/1.1" 200 OK
+INFO:     192.168.0.6:42112 - "GET /sw.js HTTP/1.1" 200 OK
+INFO:     192.168.0.6:42122 - "GET /favicon.svg HTTP/1.1" 200 OK
+INFO:     ('192.168.0.6', 42128) - "WebSocket /ws/Stephan" [accepted]
+2026-07-26 10:43:26,929 - app.backend.websocket.manager - INFO - User 'Stephan' connected. Total connections: 1
+INFO:     connection open
+INFO:     127.0.0.1:54808 - "GET /health HTTP/1.1" 200 OK
+2026-07-26 10:43:46,079 - app.main - ERROR - WebSocket error for Stephan: 1001
+2026-07-26 10:43:46,080 - app.backend.websocket.manager - INFO - User 'Stephan' disconnected. Total connections: 0
+2026-07-26 10:43:46,109 - app.main - INFO - User Stephan disconnected
+INFO:     connection closed
+INFO:     ('192.168.0.6', 33530) - "WebSocket /ws/Stephan" [accepted]
+2026-07-26 10:43:49,097 - app.backend.websocket.manager - INFO - User 'Stephan' connected. Total connections: 1
+INFO:     connection open
+INFO:     192.168.0.6:33536 - "GET /admin HTTP/1.1" 200 OK
+INFO:     192.168.0.6:33548 - "GET /api/admin/stats HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:33560 - "GET /api/cues?enabled_only=false HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:33564 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:33576 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:33580 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:37938 - "GET /health HTTP/1.1" 200 OK
+INFO:     192.168.0.6:59432 - "POST /api/cues HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:59434 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:59436 - "GET /api/admin/stats HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:59442 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:51282 - "GET /admin HTTP/1.1" 200 OK
+INFO:     192.168.0.6:51296 - "GET /api/admin/stats HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:51304 - "GET /api/cues?enabled_only=false HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:51310 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:51318 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53502 - "GET /health HTTP/1.1" 200 OK
+INFO:     192.168.0.6:38148 - "POST /api/cues HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:38152 - "POST /api/cues HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:38154 - "POST /api/cues HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:38158 - "POST /api/cues HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:40008 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:40022 - "GET /api/admin/stats HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:40034 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:42400 - "GET /health HTTP/1.1" 200 OK
+INFO:     192.168.0.6:40828 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:40840 - "GET /api/admin/stats HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:40852 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:47906 - "GET /health HTTP/1.1" 200 OK
+INFO:     192.168.0.6:54712 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:54728 - "GET /api/admin/stats HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:54744 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:48720 - "GET /health HTTP/1.1" 200 OK
+INFO:     192.168.0.6:39366 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:39374 - "GET /api/admin/stats HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:39384 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:49690 - "GET /health HTTP/1.1" 200 OK
+INFO:     192.168.0.6:52440 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:52456 - "GET /api/admin/stats HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:52458 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:44992 - "GET /health HTTP/1.1" 200 OK
+INFO:     192.168.0.6:53992 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:54006 - "GET /api/admin/stats HTTP/1.1" 404 Not Found
+INFO:     192.168.0.6:54018 - "GET /api/users HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:48752 - "GET /health HTTP/1.1" 200 OK
