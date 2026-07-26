@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  stagecomms-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stagecomms-dev
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:////app/database/stagecomms.db
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+      - UPLOAD_DIR=/app/uploads
+      - LOGS_DIR=/app/logs
+    volumes:
+      - ./app:/app/app:ro
+      - ./app/database:/app/database
+      - ./app/uploads:/app/uploads
+      - ./app/logs:/app/logs
+      - ./app/static:/app/static:ro
+      - ./app/templates:/app/templates:ro
+      - ./app/frontend:/app/frontend:ro
+    restart: unless-stopped
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - stagecomms_network
+
+networks:
+  stagecomms_network:
+    driver: bridge
