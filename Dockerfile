@@ -22,14 +22,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY app /app/app
-COPY app/database /app/database
-COPY app/uploads /app/uploads
-COPY app/logs /app/logs
 COPY app/static /app/static
 COPY app/templates /app/templates
 COPY app/frontend /app/frontend
 
-# Create necessary directories
+# Create necessary runtime directories
 RUN mkdir -p /app/database /app/uploads/audio /app/logs /app/static
 
 # Expose port
