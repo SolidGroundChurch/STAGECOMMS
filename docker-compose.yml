@@ -1,12 +1,8 @@
-version: '3.8'
-
 services:
   stagecomms:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
     environment:
       - DATABASE_URL=sqlite:////app/database/stagecomms.db
       - HOST=0.0.0.0
@@ -30,8 +26,12 @@ services:
       retries: 3
       start_period: 40s
     networks:
-      - stagecomms_network
+      stagecomms_network:
+        ipv4_address: 192.168.0.12
 
 networks:
   stagecomms_network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.0.0/24
