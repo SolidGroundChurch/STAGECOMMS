@@ -46,6 +46,22 @@ StageComms replaces unreliable radio and phone communication with instant, relia
 - Docker & Docker Compose
 - OR Python 3.13+ with pip
 
+### Raspberry Pi clone
+If you need to pull the repository onto a Raspberry Pi into the mounted folder at `/mnt/docker`, use:
+
+```bash
+sudo apt update
+sudo apt install -y git
+git clone https://github.com/SolidGroundChurch/STAGECOMMS.git /mnt/docker
+```
+
+If `/mnt/docker` already has an existing clone, update it instead:
+
+```bash
+cd /mnt/docker
+git pull
+```
+
 ### Option 1: Docker (Recommended)
 
 ```bash
