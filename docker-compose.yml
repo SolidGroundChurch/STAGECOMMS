@@ -26,12 +26,9 @@ services:
       retries: 3
       start_period: 40s
     networks:
-      stagecomms_network:
+      lan:
         ipv4_address: 192.168.0.12
 
 networks:
-  stagecomms_network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.0.0/24
+  lan:
+    external: true
