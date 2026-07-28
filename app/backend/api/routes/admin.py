@@ -1,9 +1,10 @@
 """Admin endpoints for cue management."""
+from pathlib import Path
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.backend.database.db import get_db
-from app.backend.services import CueService
+from app.backend.services import CueService, MessageService
 from app.backend.config import settings
 from pydantic import BaseModel
 import os
@@ -19,14 +20,16 @@ class AdminStats(BaseModel):
     categories: List[str]
 
 
-@router.get("/stats")
+@router.get("/stats", response_model=AdminStats)
 async def get_stats(db: Session = Depends(get_db)):
     """Get admin statistics."""
     cues = CueService.get_all_cues(db, enabled_only=False)
     categories = CueService.get_categories(db)
+    total_messages = MessageService.get_message_count(db)
     return {
         "total_cues": len(cues),
         "enabled_cues": len([c for c in cues if c.enabled]),
+        "total_messages": total_messages,
         "categories": categories,
     }
 
@@ -38,9 +41,9 @@ async def create_backup():
         import shutil
         from datetime import datetime
 
-        db_file = "/app/database/stagecomms.db"
-        if os.path.exists(db_file):
-            backup_dir = Path("/app/database/backups")
+        db_file = settings.DATABASE_DIR / "stagecomms.db"
+        if db_file.exists():
+            backup_dir = settings.DATABASE_DIR / "backups"
             backup_dir.mkdir(parents=True, exist_ok=True)
 
             timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
@@ -64,6 +67,3 @@ async def admin_health_check():
         "status": "ok",
         "admin_interface": "available",
     }
-
-
-from pathlib import Path

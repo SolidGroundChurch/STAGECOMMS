@@ -26,10 +26,14 @@ class MessageResponse(BaseModel):
 @router.get("", response_model=List[MessageResponse])
 async def get_messages(
     limit: int = Query(100, ge=1, le=1000),
+    minutes: Optional[int] = Query(None, ge=1),
     db: Session = Depends(get_db),
 ):
     """Get recent messages."""
-    messages = MessageService.get_recent_messages(db, limit)
+    if minutes is not None:
+        messages = MessageService.get_messages_since(db, minutes=minutes, limit=limit)
+    else:
+        messages = MessageService.get_recent_messages(db, limit)
     return messages[::-1]  # Reverse to get oldest first
 
 

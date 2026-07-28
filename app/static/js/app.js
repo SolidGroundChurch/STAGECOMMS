@@ -79,6 +79,13 @@ const DOM = {
     notificationVolumeInput: document.getElementById('notification-volume'),
     logoutBtn: document.getElementById('logout-btn'),
     loadingSpinner: document.getElementById('loading-spinner'),
+    temporaryMessageInput: document.getElementById('temporary-message-input'),
+    sendTemporaryMessageBtn: document.getElementById('send-temporary-message-btn'),
+    historyLast24hBtn: document.getElementById('history-last-24h-btn'),
+    historyAllBtn: document.getElementById('history-all-btn'),
+    historySearch: document.getElementById('history-search'),
+    historyFilterUser: document.getElementById('history-filter-user'),
+    historyFilterCategory: document.getElementById('history-filter-category'),
 };
 
 // ============================================
@@ -126,6 +133,27 @@ function setupEventListeners() {
     // Custom message
     DOM.customMessageInput.addEventListener('input', updateCharCount);
     document.getElementById('send-custom-btn').addEventListener('click', sendCustomMessage);
+
+    // Temporary message bar
+    DOM.temporaryMessageInput.addEventListener('input', () => {
+        const count = DOM.temporaryMessageInput.value.length;
+        if (!DOM.tempMessageCharCount) {
+            const span = document.createElement('div');
+            span.id = 'temp-message-char-count';
+            span.className = 'char-count temp';
+            DOM.temporaryMessageInput.parentNode.insertBefore(span, DOM.sendTemporaryMessageBtn);
+            DOM.tempMessageCharCount = span;
+        }
+        DOM.tempMessageCharCount.textContent = `${count}/500`;
+    });
+    DOM.sendTemporaryMessageBtn.addEventListener('click', sendTemporaryMessage);
+
+    // History controls
+    DOM.historyLast24hBtn.addEventListener('click', () => loadHistory(24 * 60));
+    DOM.historyAllBtn.addEventListener('click', () => loadHistory());
+    DOM.historySearch.addEventListener('input', filterHistory);
+    DOM.historyFilterUser.addEventListener('change', filterHistory);
+    DOM.historyFilterCategory.addEventListener('change', filterHistory);
 
     // Modals
     document.querySelectorAll('.close-btn').forEach(btn => {
@@ -542,6 +570,25 @@ async function sendCustomMessage() {
     triggerHaptic();
 }
 
+async function sendTemporaryMessage() {
+    const text = DOM.temporaryMessageInput.value.trim();
+    if (!text) {
+        alert('Please enter a temporary message');
+        return;
+    }
+
+    sendWebSocketMessage({
+        type: 'custom_message',
+        message_text: text,
+    });
+
+    DOM.temporaryMessageInput.value = '';
+    if (DOM.tempMessageCharCount) {
+        DOM.tempMessageCharCount.textContent = '0/500';
+    }
+    triggerHaptic();
+}
+
 async function handleCustomMessageReceived(message) {
     updateBanner(message);
     
@@ -609,9 +656,10 @@ async function loadAndShowHistory() {
     await loadHistory();
 }
 
-async function loadHistory() {
+async function loadHistory(minutes) {
     try {
-        const response = await fetch(`${CONFIG.API_BASE}/messages`);
+        const query = typeof minutes === 'number' ? `?minutes=${minutes}` : '';
+        const response = await fetch(`${CONFIG.API_BASE}/messages${query}`);
         const messages = await response.json();
         
         state.messages = messages;
@@ -623,6 +671,21 @@ async function loadHistory() {
         console.error('Error loading history:', error);
         DOM.historyList.innerHTML = '<p>Error loading history</p>';
     }
+}
+
+function filterHistory() {
+    const search = DOM.historySearch.value.trim().toLowerCase();
+    const user = DOM.historyFilterUser.value;
+    const category = DOM.historyFilterCategory.value;
+
+    const filtered = state.messages.filter(msg => {
+        const matchesSearch = !search || msg.message_text.toLowerCase().includes(search) || msg.username.toLowerCase().includes(search);
+        const matchesUser = !user || msg.username === user;
+        const matchesCategory = !category || msg.category === category;
+        return matchesSearch && matchesUser && matchesCategory;
+    });
+
+    renderHistory(filtered);
 }
 
 function renderHistory(messages) {

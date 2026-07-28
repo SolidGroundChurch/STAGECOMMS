@@ -68,6 +68,12 @@
             </div>
         </div>
 
+        <!-- Temporary Message Bar -->
+        <div class="message-bar">
+            <textarea id="temporary-message-input" placeholder="Type a temporary message to read aloud..." maxlength="500" rows="2"></textarea>
+            <button id="send-temporary-message-btn" class="btn btn-primary">Send</button>
+        </div>
+
         <!-- Floating Buttons -->
         <div class="floating-buttons">
             <button id="custom-message-btn" class="btn btn-fab btn-custom" title="Send custom message">
@@ -115,6 +121,10 @@
                     <select id="history-filter-category">
                         <option value="">All Categories</option>
                     </select>
+                </div>
+                <div class="history-actions">
+                    <button id="history-last-24h-btn" class="btn btn-secondary">Last 24 Hours</button>
+                    <button id="history-all-btn" class="btn btn-secondary">All Messages</button>
                 </div>
                 <div id="history-list" class="history-list">
                     <!-- Populated by JavaScript -->

@@ -274,8 +274,10 @@
                 <div class="stat-value" id="enabled-cues">0</div>
                 <div class="stat-label">Enabled Cues</div>
             </div>
-            <div class="stat">
-                <div class="stat-value" id="active-users">0</div>
+            <div class="stat">                <div class="stat-value" id="total-messages">0</div>
+                <div class="stat-label">Total Messages</div>
+            </div>
+            <div class="stat-card">                <div class="stat-value" id="active-users">0</div>
                 <div class="stat-label">Active Users</div>
             </div>
         </div>
@@ -405,6 +407,7 @@
                 
                 document.getElementById('total-cues').textContent = stats.total_cues;
                 document.getElementById('enabled-cues').textContent = stats.enabled_cues;
+                document.getElementById('total-messages').textContent = stats.total_messages;
                 
                 const usersRes = await fetch(`${API_BASE}/users`);
                 const users = await usersRes.json();

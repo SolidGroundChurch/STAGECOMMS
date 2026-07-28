@@ -112,3 +112,8 @@ class MessageService:
         )
         db.commit()
         return deleted
+
+    @staticmethod
+    def get_message_count(db: Session) -> int:
+        """Return total number of stored messages."""
+        return db.query(Message).count()

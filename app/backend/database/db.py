@@ -3,11 +3,12 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.pool import StaticPool
+from app.backend.config import settings
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "sqlite:////app/database/stagecomms.db"
-)
+# Ensure the database directory exists before SQLAlchemy creates the engine
+settings.DATABASE_DIR.mkdir(parents=True, exist_ok=True)
+
+DATABASE_URL = settings.DATABASE_URL
 
 # Use StaticPool for SQLite to avoid threading issues
 if "sqlite" in DATABASE_URL:
