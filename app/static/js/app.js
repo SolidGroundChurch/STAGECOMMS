@@ -55,9 +55,11 @@ const DOM = {
     currentUsername: document.getElementById('current-username'),
     cueGrid: document.getElementById('cue-grid'),
     testAudioBtn: document.getElementById('test-audio-btn'),
-    customMessageBtn: document.getElementById('custom-message-btn'),
-    historyBtn: document.getElementById('history-btn'),
-    settingsBtn: document.getElementById('settings-btn'),
+    menuToggle: document.getElementById('menu-toggle'),
+    menuDropdown: document.getElementById('menu-dropdown'),
+    menuUsers: document.getElementById('menu-users'),
+    menuHistory: document.getElementById('menu-history'),
+    menuSettings: document.getElementById('menu-settings'),
     cueOverlay: document.getElementById('cue-overlay'),
     overlayMessage: document.getElementById('overlay-message'),
     overlaySender: document.getElementById('overlay-sender'),
@@ -126,9 +128,34 @@ function setupEventListeners() {
 
     // Navigation
     DOM.testAudioBtn.addEventListener('click', testAudio);
-    DOM.customMessageBtn.addEventListener('click', () => openModal(DOM.customMessageModal));
-    DOM.historyBtn.addEventListener('click', loadAndShowHistory);
-    DOM.settingsBtn.addEventListener('click', () => openModal(DOM.settingsModal));
+    
+    // Hamburger menu
+    DOM.menuToggle.addEventListener('click', () => {
+        DOM.menuDropdown.classList.toggle('hidden');
+    });
+    
+    DOM.menuUsers.addEventListener('click', () => {
+        DOM.menuDropdown.classList.add('hidden');
+        openPanel(DOM.usersPanel);
+        loadUsers();
+    });
+    
+    DOM.menuHistory.addEventListener('click', () => {
+        DOM.menuDropdown.classList.add('hidden');
+        loadAndShowHistory();
+    });
+    
+    DOM.menuSettings.addEventListener('click', () => {
+        DOM.menuDropdown.classList.add('hidden');
+        openModal(DOM.settingsModal);
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.hamburger-menu')) {
+            DOM.menuDropdown.classList.add('hidden');
+        }
+    });
 
     // Custom message
     DOM.customMessageInput.addEventListener('input', updateCharCount);
