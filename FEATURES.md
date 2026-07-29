@@ -107,7 +107,7 @@ Complete feature list for StageComms v1.0.0
   - Enable/disable flag
 
 ### ✓ Pre-Configured Cues
-14 default cues included:
+33 default cues included, including production, camera director, and stage manager calls.
 - GO (Green)
 - Standby (Amber)
 - Next Speaker (Blue)
@@ -122,6 +122,8 @@ Complete feature list for StageComms v1.0.0
 - Camera 2 (Teal)
 - Wide Shot (Cyan)
 - Emergency Stop (Red)
+- Camera Director commands for live, focus, close, frame, headroom, and footroom checks
+- Stage manager host mic cues for live on-air calls
 
 ### ✓ Button Customization
 - Custom hex colors (#RRGGBB)

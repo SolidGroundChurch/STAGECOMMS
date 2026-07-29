@@ -330,22 +330,19 @@ ws://localhost:8000/ws/{username}
 
 ### Default Cues (Included)
 
-| Cue | Category | Color |
-|-----|----------|-------|
-| GO | general | Green |
-| Standby | general | Amber |
-| Next Speaker | stage | Blue |
-| Prayer | stage | Purple |
-| Offering | stage | Pink |
-| Announcements | general | Orange |
-| Start Music | audio | Cyan |
-| Stop Music | audio | Red |
-| Lights Up | lighting | Yellow |
-| Lights Down | lighting | Gray |
-| Camera 1 | cameras | Teal |
-| Camera 2 | cameras | Teal |
-| Wide Shot | cameras | Cyan |
-| Emergency Stop | emergency | Red |
+StageComms ships with a large set of default cues for quick setup. The built-in cue library now includes production, camera director, and stage manager commands across several categories.
+
+- Total default cues: 33
+- Categories: `general`, `stage`, `audio`, `lighting`, `cameras`, `Camera Director`, `Stage manager`
+
+Key defaults include:
+- GO, Standby, Announcements, Prayer, Offering
+- Start Music, Stop Music, Lights Up, Lights Down
+- Camera 1, Camera 2, Wide Shot, Emergency Stop
+- Camera Director calls such as `Camera 1 Live`, `Camera 2 Focus`, `Camera 3 - Headroom`, `Camera 1 - Footroom`
+- Stage manager cues: `Host 1 Going on`, `Host 2 Going on`
+
+Use the admin panel to modify, remove, or reorder any of these cues after initialization.
 
 ---
 

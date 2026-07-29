@@ -174,7 +174,7 @@ http://192.168.1.100:8000
 | **Lines of CSS** | ~1000 |
 | **Lines of HTML** | ~400 |
 | **Documentation** | 8 guides |
-| **Default Cues** | 14 configured |
+| **Default Cues** | 33 configured |
 | **Endpoints** | 20+ REST + WebSocket |
 | **Database Tables** | 3 (Cue, Message, User) |
 | **Build Time** | < 2 minutes |

@@ -72,13 +72,7 @@ http://localhost:8000
 
 ### Create Default Cues
 
-Database comes with 14 pre-configured cues:
-- GO, Standby, Next Speaker
-- Prayer, Offering, Announcements
-- Start Music, Stop Music
-- Lights Up, Lights Down
-- Camera 1, Camera 2, Wide Shot
-- Emergency Stop
+Database comes with 33 pre-configured cues, including production calls, camera director cues, and stage manager host cues.
 
 ### Test Audio
 
