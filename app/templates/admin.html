@@ -420,6 +420,9 @@
         async function loadCues() {
             try {
                 const res = await fetch(`${API_BASE}/cues?enabled_only=false`);
+                if (!res.ok) {
+                    throw new Error(`API returned ${res.status}: ${res.statusText}`);
+                }
                 const cues = await res.json();
 
                 // Populate select
@@ -435,6 +438,12 @@
                 // Populate table
                 const tbody = document.getElementById('cues-tbody');
                 tbody.innerHTML = '';
+                
+                if (cues.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #94A3B8;">No cues found</td></tr>';
+                    return;
+                }
+                
                 cues.forEach(cue => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -453,6 +462,9 @@
                 });
             } catch (error) {
                 console.error('Error loading cues:', error);
+                const tbody = document.getElementById('cues-tbody');
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #EF4444;">Error: ${error.message}</td></tr>`;
+                showMessage(`Error loading cues: ${error.message}`, 'error');
             }
         }
 
