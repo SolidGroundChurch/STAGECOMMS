@@ -52,7 +52,7 @@ html, body {
 }
 
 :root {
-    --message-bar-height: 5rem;
+    --message-bar-height: 7rem;
 }
 
 .screen {
@@ -366,11 +366,12 @@ html, body {
 /* Floating Buttons */
 .floating-buttons {
     position: fixed;
-    bottom: calc(var(--message-bar-height) + 1rem + var(--safe-bottom));
+    bottom: calc(1rem + var(--safe-bottom));
     right: 1rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    z-index: 10;
 }
 
 .btn-custom {
