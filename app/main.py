@@ -11,6 +11,7 @@ from app.backend.database import seed_default_cues
 from app.backend.websocket import ConnectionManager, WebSocketHandler
 from app.backend.services import UserService, MessageService, CueService
 from app.backend.api.routes import health, cues, users, messages, admin
+from app.backend.models import Cue, User, Message
 
 # Configure logging
 settings.setup_logging()
