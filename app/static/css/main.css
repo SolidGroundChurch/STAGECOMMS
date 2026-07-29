@@ -223,8 +223,11 @@ html, body {
    ============================================ */
 
 #main-screen {
-    flex-direction: column;
-    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
 }
 
 /* Top Banner */
@@ -239,6 +242,7 @@ html, body {
     flex-shrink: 0;
     box-shadow: var(--shadow-sm);
     z-index: 10;
+    height: 4rem;
 }
 
 .username-chip {
@@ -300,7 +304,7 @@ html, body {
     padding: 1rem;
     -webkit-overflow-scrolling: touch;
     min-height: 0;
-    height: 0;
+    height: auto;
 }
 
 /* Cue Grid */
@@ -695,6 +699,7 @@ html, body {
     gap: 0.75rem;
     flex-shrink: 0;
     padding-bottom: max(1rem, var(--safe-bottom));
+    min-height: 5rem;
 }
 
 .message-bar textarea {
