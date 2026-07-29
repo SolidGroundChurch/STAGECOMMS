@@ -88,7 +88,7 @@ async def get_cue(cue_id: int, db: Session = Depends(get_db)):
     return cue.to_dict()
 
 
-@router.post("", response_model=CueResponse)
+@router.post("")
 async def create_cue(
     request: CreateCueRequest,
     db: Session = Depends(get_db),
@@ -106,10 +106,10 @@ async def create_cue(
         sort_order=request.sort_order,
         enabled=request.enabled,
     )
-    return cue
+    return cue.to_dict()
 
 
-@router.put("/{cue_id}", response_model=CueResponse)
+@router.put("/{cue_id}")
 async def update_cue(
     cue_id: int,
     request: UpdateCueRequest,
@@ -123,7 +123,7 @@ async def update_cue(
     )
     if not cue:
         raise HTTPException(status_code=404, detail="Cue not found")
-    return cue
+    return cue.to_dict()
 
 
 @router.delete("/{cue_id}")
