@@ -9,16 +9,29 @@ from app.backend.database.db import init_db, SessionLocal
 from app.backend.services import CueService
 
 
-def seed_default_cues():
-    """Populate database with default cues."""
+def seed_default_cues(force: bool = False):
+    """Populate database with default cues.
+    
+    Args:
+        force: If True, re-seed even if cues already exist
+    """
     db = SessionLocal()
 
     try:
         # Check if cues already exist
         existing = CueService.get_all_cues(db, enabled_only=False)
-        if existing:
-            print("Database already has cues, skipping seed data")
+        if existing and not force:
+            print(f"Database already has {len(existing)} cues, skipping seed data")
             return
+        
+        if force:
+            print(f"Force re-seed: clearing {len(existing)} existing cues...")
+            # Delete all existing cues
+            for cue in existing:
+                db.delete(cue)
+            db.commit()
+        
+        print("No cues found in database, seeding default cues...")
 
         # Default cues
         default_cues = [
@@ -299,8 +312,14 @@ def seed_default_cues():
 
 
 if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Initialize StageComms database")
+    parser.add_argument("--force", action="store_true", help="Force re-seed of default cues")
+    args = parser.parse_args()
+    
     print("Initializing StageComms database...")
     init_db()
     print("Database tables created")
-    seed_default_cues()
+    seed_default_cues(force=args.force)
     print("Database initialization complete!")
