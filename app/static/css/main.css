@@ -366,7 +366,7 @@ html, body {
 /* Floating Buttons */
 .floating-buttons {
     position: fixed;
-    bottom: calc(1rem + var(--safe-bottom));
+    top: 5rem;
     right: 1rem;
     display: flex;
     flex-direction: column;
