@@ -61,6 +61,7 @@ const DOM = {
     menuUsers: document.getElementById('menu-users'),
     menuHistory: document.getElementById('menu-history'),
     menuSettings: document.getElementById('menu-settings'),
+    menuTestAudio: document.getElementById('menu-test-audio'),
     cueOverlay: document.getElementById('cue-overlay'),
     overlayMessage: document.getElementById('overlay-message'),
     overlaySender: document.getElementById('overlay-sender'),
@@ -128,7 +129,9 @@ function setupEventListeners() {
     });
 
     // Navigation
-    DOM.testAudioBtn.addEventListener('click', testAudio);
+    if (DOM.testAudioBtn) {
+        DOM.testAudioBtn.addEventListener('click', testAudio);
+    }
     
     // Category filter
     if (DOM.categoryFilter) {
@@ -162,6 +165,13 @@ function setupEventListeners() {
         DOM.menuSettings.addEventListener('click', () => {
             DOM.menuDropdown.classList.add('hidden');
             openModal(DOM.settingsModal);
+        });
+    }
+    
+    if (DOM.menuTestAudio) {
+        DOM.menuTestAudio.addEventListener('click', () => {
+            DOM.menuDropdown.classList.add('hidden');
+            testAudio();
         });
     }
     
