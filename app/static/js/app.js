@@ -401,9 +401,15 @@ async function renderCueGrid() {
         ? state.cues.filter(cue => cue.category === selectedCategory)
         : state.cues;
     
-    // Separate utility cues
-    const utilityCues = filteredCues.filter(cue => cue.category.toLowerCase() === 'utility');
-    const otherCues = filteredCues.filter(cue => cue.category.toLowerCase() !== 'utility');
+    // Separate utility cues (case-insensitive comparison)
+    const utilityCues = filteredCues.filter(cue => {
+        const category = (cue.category || '').trim().toLowerCase();
+        return category === 'utility';
+    });
+    const otherCues = filteredCues.filter(cue => {
+        const category = (cue.category || '').trim().toLowerCase();
+        return category !== 'utility';
+    });
     
     // Render non-utility cues first
     otherCues.forEach(cue => {
@@ -426,9 +432,15 @@ function filterCuesByCategory() {
         ? state.cues.filter(cue => cue.category === selectedCategory)
         : state.cues;
     
-    // Separate utility cues
-    const utilityCues = filteredCues.filter(cue => cue.category.toLowerCase() === 'utility');
-    const otherCues = filteredCues.filter(cue => cue.category.toLowerCase() !== 'utility');
+    // Separate utility cues (case-insensitive comparison)
+    const utilityCues = filteredCues.filter(cue => {
+        const category = (cue.category || '').trim().toLowerCase();
+        return category === 'utility';
+    });
+    const otherCues = filteredCues.filter(cue => {
+        const category = (cue.category || '').trim().toLowerCase();
+        return category !== 'utility';
+    });
     
     // Re-render cue grid
     DOM.cueGrid.innerHTML = '';
@@ -445,9 +457,12 @@ function filterCuesByCategory() {
 }
 
 function loadCategories() {
-    // Extract unique categories from cues, excluding 'utility'
+    // Extract unique categories from cues, excluding 'utility' (case-insensitive)
     const categories = [...new Set(state.cues.map(cue => cue.category))]
-        .filter(category => category.toLowerCase() !== 'utility')
+        .filter(category => {
+            const cat = (category || '').trim().toLowerCase();
+            return cat !== 'utility';
+        })
         .sort();
     
     // Populate category filter dropdown
