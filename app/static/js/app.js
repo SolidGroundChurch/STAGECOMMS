@@ -387,12 +387,22 @@ async function renderCueGrid() {
     const selectedCategory = DOM.categoryFilter ? DOM.categoryFilter.value : '';
     
     // Filter cues by category
-    const filteredCues = selectedCategory 
+    let filteredCues = selectedCategory 
         ? state.cues.filter(cue => cue.category === selectedCategory)
         : state.cues;
     
-    // Render cues
-    filteredCues.forEach(cue => {
+    // Separate utility cues
+    const utilityCues = filteredCues.filter(cue => cue.category.toLowerCase() === 'utility');
+    const otherCues = filteredCues.filter(cue => cue.category.toLowerCase() !== 'utility');
+    
+    // Render non-utility cues first
+    otherCues.forEach(cue => {
+        const button = createCueButton(cue);
+        DOM.cueGrid.appendChild(button);
+    });
+    
+    // Render utility cues at the bottom
+    utilityCues.forEach(cue => {
         const button = createCueButton(cue);
         DOM.cueGrid.appendChild(button);
     });
@@ -402,21 +412,33 @@ function filterCuesByCategory() {
     const selectedCategory = DOM.categoryFilter ? DOM.categoryFilter.value : '';
     
     // Filter cues by category
-    const filteredCues = selectedCategory 
+    let filteredCues = selectedCategory 
         ? state.cues.filter(cue => cue.category === selectedCategory)
         : state.cues;
     
+    // Separate utility cues
+    const utilityCues = filteredCues.filter(cue => cue.category.toLowerCase() === 'utility');
+    const otherCues = filteredCues.filter(cue => cue.category.toLowerCase() !== 'utility');
+    
     // Re-render cue grid
     DOM.cueGrid.innerHTML = '';
-    filteredCues.forEach(cue => {
+    otherCues.forEach(cue => {
+        const button = createCueButton(cue);
+        DOM.cueGrid.appendChild(button);
+    });
+    
+    // Render utility cues at the bottom
+    utilityCues.forEach(cue => {
         const button = createCueButton(cue);
         DOM.cueGrid.appendChild(button);
     });
 }
 
 function loadCategories() {
-    // Extract unique categories from cues
-    const categories = [...new Set(state.cues.map(cue => cue.category))].sort();
+    // Extract unique categories from cues, excluding 'utility'
+    const categories = [...new Set(state.cues.map(cue => cue.category))]
+        .filter(category => category.toLowerCase() !== 'utility')
+        .sort();
     
     // Populate category filter dropdown
     if (DOM.categoryFilter) {
