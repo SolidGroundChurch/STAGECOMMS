@@ -300,6 +300,7 @@ html, body {
     padding: 1rem;
     -webkit-overflow-scrolling: touch;
     min-height: 0;
+    height: 0;
 }
 
 /* Cue Grid */
@@ -307,7 +308,6 @@ html, body {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
-    padding-bottom: 1rem;
 }
 
 .cue-button {
