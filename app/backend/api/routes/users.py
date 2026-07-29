@@ -19,11 +19,11 @@ class UserResponse(BaseModel):
         from_attributes = True
 
 
-@router.get("", response_model=List[UserResponse])
+@router.get("")
 async def get_users(db: Session = Depends(get_db)):
     """Get all connected users."""
     users = UserService.get_all_users(db)
-    return users
+    return [user.to_dict() for user in users]
 
 
 @router.get("/{username}", response_model=UserResponse)

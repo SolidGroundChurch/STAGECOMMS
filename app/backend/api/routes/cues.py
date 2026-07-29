@@ -58,7 +58,7 @@ class UpdateCueRequest(BaseModel):
     enabled: Optional[bool] = None
 
 
-@router.get("", response_model=List[CueResponse])
+@router.get("")
 async def get_cues(
     enabled_only: bool = Query(True),
     category: Optional[str] = Query(None),
@@ -69,7 +69,7 @@ async def get_cues(
         cues = CueService.get_cues_by_category(db, category, enabled_only)
     else:
         cues = CueService.get_all_cues(db, enabled_only)
-    return cues
+    return [cue.to_dict() for cue in cues]
 
 
 @router.get("/categories")
