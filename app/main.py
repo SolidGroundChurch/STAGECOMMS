@@ -7,6 +7,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.backend.config import settings
 from app.backend.database.db import init_db, get_db
+from app.backend.database import seed_default_cues
 from app.backend.websocket import ConnectionManager, WebSocketHandler
 from app.backend.services import UserService, MessageService, CueService
 from app.backend.api.routes import health, cues, users, messages, admin
@@ -20,6 +21,9 @@ settings.create_directories()
 
 # Initialize database
 init_db()
+
+# Seed default cues
+seed_default_cues()
 
 # Global WebSocket manager
 manager = ConnectionManager()
