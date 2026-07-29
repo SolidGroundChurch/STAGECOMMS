@@ -55,6 +55,7 @@ const DOM = {
     currentUsername: document.getElementById('current-username'),
     cueGrid: document.getElementById('cue-grid'),
     testAudioBtn: document.getElementById('test-audio-btn'),
+    categoryFilter: document.getElementById('category-filter'),
     menuToggle: document.getElementById('menu-toggle'),
     menuDropdown: document.getElementById('menu-dropdown'),
     menuUsers: document.getElementById('menu-users'),
@@ -128,6 +129,11 @@ function setupEventListeners() {
 
     // Navigation
     DOM.testAudioBtn.addEventListener('click', testAudio);
+    
+    // Category filter
+    if (DOM.categoryFilter) {
+        DOM.categoryFilter.addEventListener('change', filterCuesByCategory);
+    }
     
     // Hamburger menu
     if (DOM.menuToggle && DOM.menuDropdown) {
@@ -334,6 +340,7 @@ function handleWSMessage(event) {
                 break;
             case 'cues_list':
                 state.cues = message.cues;
+                loadCategories();
                 renderCueGrid();
                 break;
             default:
@@ -376,20 +383,51 @@ function sendHeartbeat() {
 async function renderCueGrid() {
     DOM.cueGrid.innerHTML = '';
     
-    // Group cues by category
-    const categories = {};
-    state.cues.forEach(cue => {
-        if (!categories[cue.category]) {
-            categories[cue.category] = [];
-        }
-        categories[cue.category].push(cue);
-    });
-
+    // Get selected category filter
+    const selectedCategory = DOM.categoryFilter ? DOM.categoryFilter.value : '';
+    
+    // Filter cues by category
+    const filteredCues = selectedCategory 
+        ? state.cues.filter(cue => cue.category === selectedCategory)
+        : state.cues;
+    
     // Render cues
-    state.cues.forEach(cue => {
+    filteredCues.forEach(cue => {
         const button = createCueButton(cue);
         DOM.cueGrid.appendChild(button);
     });
+}
+
+function filterCuesByCategory() {
+    const selectedCategory = DOM.categoryFilter ? DOM.categoryFilter.value : '';
+    
+    // Filter cues by category
+    const filteredCues = selectedCategory 
+        ? state.cues.filter(cue => cue.category === selectedCategory)
+        : state.cues;
+    
+    // Re-render cue grid
+    DOM.cueGrid.innerHTML = '';
+    filteredCues.forEach(cue => {
+        const button = createCueButton(cue);
+        DOM.cueGrid.appendChild(button);
+    });
+}
+
+function loadCategories() {
+    // Extract unique categories from cues
+    const categories = [...new Set(state.cues.map(cue => cue.category))].sort();
+    
+    // Populate category filter dropdown
+    if (DOM.categoryFilter) {
+        DOM.categoryFilter.innerHTML = '<option value="">All Categories</option>';
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+            DOM.categoryFilter.appendChild(option);
+        });
+    }
 }
 
 function createCueButton(cue) {

@@ -446,6 +446,8 @@
                 
                 cues.forEach(cue => {
                     const row = document.createElement('tr');
+                    row.setAttribute('draggable', 'true');
+                    row.setAttribute('data-cue-id', cue.id);
                     row.innerHTML = `
                         <td><strong>${cue.display_name}</strong></td>
                         <td>${cue.category}</td>
@@ -458,6 +460,13 @@
                             </div>
                         </td>
                     `;
+                    
+                    // Add drag events
+                    row.addEventListener('dragstart', handleDragStart);
+                    row.addEventListener('dragover', handleDragOver);
+                    row.addEventListener('drop', handleDrop);
+                    row.addEventListener('dragend', handleDragEnd);
+                    
                     tbody.appendChild(row);
                 });
             } catch (error) {
@@ -716,6 +725,72 @@
             container.appendChild(message);
 
             setTimeout(() => message.remove(), 4000);
+        }
+
+        // Drag and drop handlers
+        let draggedRow = null;
+
+        function handleDragStart(e) {
+            draggedRow = this;
+            this.style.opacity = '0.5';
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDrop(e) {
+            e.stopPropagation();
+            if (draggedRow !== this) {
+                // Get cue IDs
+                const draggedId = parseInt(draggedRow.getAttribute('data-cue-id'));
+                const targetId = parseInt(this.getAttribute('data-cue-id'));
+                
+                // Get all rows and their IDs
+                const tbody = document.getElementById('cues-tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const cueIds = rows.map(row => parseInt(row.getAttribute('data-cue-id')));
+                
+                // Reorder the array
+                const draggedIndex = cueIds.indexOf(draggedId);
+                const targetIndex = cueIds.indexOf(targetId);
+                
+                if (draggedIndex !== -1 && targetIndex !== -1) {
+                    cueIds.splice(draggedIndex, 1);
+                    cueIds.splice(targetIndex, 0, draggedId);
+                    
+                    // Send to server
+                    saveCueOrder(cueIds);
+                }
+            }
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.style.opacity = '1';
+            draggedRow = null;
+        }
+
+        async function saveCueOrder(cueIds) {
+            try {
+                const res = await fetch(`${API_BASE}/cues/order`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cue_ids: cueIds }),
+                });
+
+                if (res.ok) {
+                    showMessage('Cue order saved', 'success');
+                    loadCues();
+                } else {
+                    showMessage('Error saving cue order', 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
         }
 
         document.getElementById('cue-colour').addEventListener('input', (e) => {
