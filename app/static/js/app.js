@@ -130,29 +130,38 @@ function setupEventListeners() {
     DOM.testAudioBtn.addEventListener('click', testAudio);
     
     // Hamburger menu
-    DOM.menuToggle.addEventListener('click', () => {
-        DOM.menuDropdown.classList.toggle('hidden');
-    });
+    if (DOM.menuToggle && DOM.menuDropdown) {
+        DOM.menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            DOM.menuDropdown.classList.toggle('hidden');
+        });
+    }
     
-    DOM.menuUsers.addEventListener('click', () => {
-        DOM.menuDropdown.classList.add('hidden');
-        openPanel(DOM.usersPanel);
-        loadUsers();
-    });
+    if (DOM.menuUsers) {
+        DOM.menuUsers.addEventListener('click', () => {
+            DOM.menuDropdown.classList.add('hidden');
+            openPanel(DOM.usersPanel);
+            loadUsers();
+        });
+    }
     
-    DOM.menuHistory.addEventListener('click', () => {
-        DOM.menuDropdown.classList.add('hidden');
-        loadAndShowHistory();
-    });
+    if (DOM.menuHistory) {
+        DOM.menuHistory.addEventListener('click', () => {
+            DOM.menuDropdown.classList.add('hidden');
+            loadAndShowHistory();
+        });
+    }
     
-    DOM.menuSettings.addEventListener('click', () => {
-        DOM.menuDropdown.classList.add('hidden');
-        openModal(DOM.settingsModal);
-    });
+    if (DOM.menuSettings) {
+        DOM.menuSettings.addEventListener('click', () => {
+            DOM.menuDropdown.classList.add('hidden');
+            openModal(DOM.settingsModal);
+        });
+    }
     
     // Close menu when clicking outside
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.hamburger-menu')) {
+        if (DOM.menuDropdown && !e.target.closest('.hamburger-menu')) {
             DOM.menuDropdown.classList.add('hidden');
         }
     });
