@@ -79,13 +79,13 @@ async def get_categories(db: Session = Depends(get_db)):
     return {"categories": categories}
 
 
-@router.get("/{cue_id}", response_model=CueResponse)
+@router.get("/{cue_id}")
 async def get_cue(cue_id: int, db: Session = Depends(get_db)):
     """Get a specific cue."""
     cue = CueService.get_cue_by_id(db, cue_id)
     if not cue:
         raise HTTPException(status_code=404, detail="Cue not found")
-    return cue
+    return cue.to_dict()
 
 
 @router.post("", response_model=CueResponse)

@@ -594,6 +594,87 @@
             }
         }
 
+        async function editCue(cueId) {
+            try {
+                const res = await fetch(`${API_BASE}/cues/${cueId}`);
+                if (!res.ok) {
+                    showMessage('Error loading cue details', 'error');
+                    return;
+                }
+                const cue = await res.json();
+
+                // Populate form with cue data
+                document.getElementById('cue-name').value = cue.display_name;
+                document.getElementById('cue-spoken').value = cue.spoken_text || '';
+                document.getElementById('cue-category').value = cue.category;
+                document.getElementById('cue-colour').value = cue.button_colour;
+                document.getElementById('colour-preview').style.backgroundColor = cue.button_colour;
+                document.getElementById('cue-icon').value = cue.icon;
+                document.getElementById('cue-audio-mode').value = cue.audio_mode;
+
+                // Change button to update
+                const createBtn = document.querySelector('.btn-primary[onclick="createCue()"]');
+                createBtn.textContent = 'Update Cue';
+                createBtn.onclick = () => updateCue(cueId);
+
+                showMessage('Edit mode - make changes and click Update', 'success');
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function updateCue(cueId) {
+            const name = document.getElementById('cue-name').value;
+            const spoken = document.getElementById('cue-spoken').value;
+            const category = document.getElementById('cue-category').value;
+            const colour = document.getElementById('cue-colour').value;
+            const icon = document.getElementById('cue-icon').value;
+            const audioMode = document.getElementById('cue-audio-mode').value;
+
+            if (!name) {
+                showMessage('Please enter a cue name', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/cues/${cueId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        display_name: name,
+                        spoken_text: spoken,
+                        category,
+                        button_colour: colour,
+                        icon,
+                        audio_mode: audioMode,
+                    }),
+                });
+
+                if (res.ok) {
+                    showMessage('Cue updated successfully', 'success');
+                    // Reset form
+                    document.getElementById('cue-name').value = '';
+                    document.getElementById('cue-spoken').value = '';
+                    document.getElementById('cue-category').value = '';
+                    document.getElementById('cue-colour').value = '#3B82F6';
+                    document.getElementById('colour-preview').style.backgroundColor = '#3B82F6';
+                    document.getElementById('cue-icon').value = 'bell';
+                    document.getElementById('cue-audio-mode').value = 'automatic';
+                    
+                    // Reset button back to create
+                    const updateBtn = document.querySelector('.btn-primary');
+                    updateBtn.textContent = 'Create Cue';
+                    updateBtn.onclick = createCue;
+                    
+                    loadCues();
+                } else {
+                    showMessage('Error updating cue', 'error');
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+
         async function checkHealth() {
             try {
                 const res = await fetch(`${API_BASE}/health`);
