@@ -140,7 +140,7 @@ function setupEventListeners() {
     if (DOM.menuUsers) {
         DOM.menuUsers.addEventListener('click', () => {
             DOM.menuDropdown.classList.add('hidden');
-            openPanel(DOM.usersPanel);
+            openModal(DOM.usersPanel);
             loadUsers();
         });
     }
