@@ -39,6 +39,7 @@ const state = {
         soundEnabled: true,
         vibrationEnabled: true,
         fullScreenCues: true,
+        keepScreenOn: true,
         notificationVolume: 0.8,
     },
 };
@@ -80,6 +81,7 @@ const DOM = {
     soundEnabledCheckbox: document.getElementById('sound-enabled'),
     vibrationEnabledCheckbox: document.getElementById('vibration-enabled'),
     fullScreenCuesCheckbox: document.getElementById('full-screen-cues'),
+    keepScreenOnCheckbox: document.getElementById('keep-screen-on'),
     notificationVolumeInput: document.getElementById('notification-volume'),
     logoutBtn: document.getElementById('logout-btn'),
     loadingSpinner: document.getElementById('loading-spinner'),
@@ -217,13 +219,21 @@ function setupEventListeners() {
         state.settings.soundEnabled = e.target.checked;
         saveSettings();
     });
+    
     DOM.vibrationEnabledCheckbox.addEventListener('change', (e) => {
         state.settings.vibrationEnabled = e.target.checked;
         saveSettings();
     });
+    
     DOM.fullScreenCuesCheckbox.addEventListener('change', (e) => {
         state.settings.fullScreenCues = e.target.checked;
         saveSettings();
+    });
+    
+    DOM.keepScreenOnCheckbox.addEventListener('change', (e) => {
+        state.settings.keepScreenOn = e.target.checked;
+        saveSettings();
+        toggleWakeLock(e.target.checked);
     });
     DOM.notificationVolumeInput.addEventListener('change', (e) => {
         state.settings.notificationVolume = e.target.value / 100;
@@ -908,12 +918,57 @@ function loadSettings() {
             DOM.soundEnabledCheckbox.checked = state.settings.soundEnabled;
             DOM.vibrationEnabledCheckbox.checked = state.settings.vibrationEnabled;
             DOM.fullScreenCuesCheckbox.checked = state.settings.fullScreenCues;
+            DOM.keepScreenOnCheckbox.checked = state.settings.keepScreenOn;
             DOM.notificationVolumeInput.value = state.settings.notificationVolume * 100;
+            
+            // Initialize wake lock based on setting
+            if (state.settings.keepScreenOn) {
+                toggleWakeLock(true);
+            }
         } catch (error) {
             console.error('Error loading settings:', error);
         }
     }
 }
+
+// ============================================
+// SCREEN WAKE LOCK
+// ============================================
+
+let wakeLock = null;
+
+async function toggleWakeLock(enable) {
+    if (!('wakeLock' in navigator)) {
+        console.log('Screen Wake Lock API not supported');
+        return;
+    }
+
+    if (enable) {
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log('Screen Wake Lock activated');
+            
+            wakeLock.addEventListener('release', () => {
+                console.log('Screen Wake Lock released');
+                wakeLock = null;
+            });
+        } catch (error) {
+            console.error('Error requesting wake lock:', error);
+        }
+    } else {
+        if (wakeLock) {
+            wakeLock.release();
+            wakeLock = null;
+        }
+    }
+}
+
+// Re-request wake lock when visibility changes (browser may release it)
+document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible' && state.settings.keepScreenOn) {
+        await toggleWakeLock(true);
+    }
+});
 
 // ============================================
 // CONNECTION STATUS
