@@ -55,6 +55,10 @@
                 </select>
             </div>
             
+            <button id="touch-guard-toggle" class="btn btn-icon" title="Touch Guard">
+                <span id="lock-icon">🔓</span>
+            </button>
+            
             <div class="hamburger-menu">
                 <button id="menu-toggle" class="btn btn-icon" title="Menu">
                     <span>☰</span>
@@ -84,6 +88,15 @@
             <!-- Cue Grid -->
             <div id="cue-grid" class="cue-grid">
                 <!-- Populated by JavaScript -->
+            </div>
+            
+            <!-- Touch Guard Overlay for Cue Grid -->
+            <div id="touch-guard-cue-grid" class="touch-guard-overlay hidden">
+                <div class="touch-guard-lock">
+                    <span class="touch-guard-icon">🔒</span>
+                    <span class="touch-guard-text">Hold to Unlock</span>
+                    <div class="touch-guard-progress"></div>
+                </div>
             </div>
         </div>
 
@@ -145,12 +158,23 @@
                     <h2>Custom Message</h2>
                     <button class="btn btn-icon close-btn">×</button>
                 </div>
-                <textarea 
-                    id="custom-message-input" 
-                    placeholder="Type your message..." 
-                    maxlength="500"
-                    rows="4"
-                ></textarea>
+                <div style="position: relative;">
+                    <textarea 
+                        id="custom-message-input" 
+                        placeholder="Type your message..." 
+                        maxlength="500"
+                        rows="4"
+                    ></textarea>
+                    
+                    <!-- Touch Guard Overlay for Custom Message -->
+                    <div id="touch-guard-custom-message" class="touch-guard-overlay hidden">
+                        <div class="touch-guard-lock">
+                            <span class="touch-guard-icon">🔒</span>
+                            <span class="touch-guard-text">Hold to Unlock</span>
+                            <div class="touch-guard-progress"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="char-count">
                     <span id="char-count">0</span>/500
                 </div>

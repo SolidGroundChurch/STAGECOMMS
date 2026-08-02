@@ -41,7 +41,9 @@ const state = {
         fullScreenCues: true,
         keepScreenOn: true,
         notificationVolume: 0.8,
+        touchGuardEnabled: false,
     },
+    touchGuardActive: false,
 };
 
 // ============================================
@@ -63,6 +65,10 @@ const DOM = {
     menuHistory: document.getElementById('menu-history'),
     menuSettings: document.getElementById('menu-settings'),
     menuTestAudio: document.getElementById('menu-test-audio'),
+    touchGuardToggle: document.getElementById('touch-guard-toggle'),
+    lockIcon: document.getElementById('lock-icon'),
+    touchGuardCueGrid: document.getElementById('touch-guard-cue-grid'),
+    touchGuardCustomMessage: document.getElementById('touch-guard-custom-message'),
     cueOverlay: document.getElementById('cue-overlay'),
     overlayMessage: document.getElementById('overlay-message'),
     overlaySender: document.getElementById('overlay-sender'),
@@ -175,6 +181,21 @@ function setupEventListeners() {
             DOM.menuDropdown.classList.add('hidden');
             testAudio();
         });
+    }
+    
+    // Touch guard toggle
+    if (DOM.touchGuardToggle) {
+        DOM.touchGuardToggle.addEventListener('click', toggleTouchGuard);
+    }
+    
+    // Touch guard unlock (cue grid)
+    if (DOM.touchGuardCueGrid) {
+        setupTouchGuardUnlock(DOM.touchGuardCueGrid);
+    }
+    
+    // Touch guard unlock (custom message)
+    if (DOM.touchGuardCustomMessage) {
+        setupTouchGuardUnlock(DOM.touchGuardCustomMessage);
     }
     
     // Close menu when clicking outside
@@ -929,6 +950,10 @@ function loadSettings() {
             if (state.settings.keepScreenOn) {
                 toggleWakeLock(true);
             }
+            
+            // Initialize touch guard based on setting
+            state.touchGuardActive = state.settings.touchGuardEnabled;
+            updateTouchGuardUI();
         } catch (error) {
             console.error('Error loading settings:', error);
         }
@@ -973,6 +998,126 @@ document.addEventListener('visibilitychange', async () => {
         await toggleWakeLock(true);
     }
 });
+
+// ============================================
+// TOUCH GUARD
+// ============================================
+
+function toggleTouchGuard() {
+    state.settings.touchGuardEnabled = !state.settings.touchGuardEnabled;
+    state.touchGuardActive = state.settings.touchGuardEnabled;
+    saveSettings();
+    updateTouchGuardUI();
+}
+
+function updateTouchGuardUI() {
+    // Update lock icon
+    if (DOM.lockIcon) {
+        DOM.lockIcon.textContent = state.touchGuardActive ? '🔒' : '🔓';
+    }
+    
+    // Show/hide overlays
+    if (DOM.touchGuardCueGrid) {
+        if (state.touchGuardActive) {
+            DOM.touchGuardCueGrid.classList.remove('hidden');
+        } else {
+            DOM.touchGuardCueGrid.classList.add('hidden');
+        }
+    }
+    
+    if (DOM.touchGuardCustomMessage) {
+        if (state.touchGuardActive) {
+            DOM.touchGuardCustomMessage.classList.remove('hidden');
+        } else {
+            DOM.touchGuardCustomMessage.classList.add('hidden');
+        }
+    }
+}
+
+function setupTouchGuardUnlock(overlay) {
+    const lockElement = overlay.querySelector('.touch-guard-lock');
+    const progressElement = overlay.querySelector('.touch-guard-progress');
+    let holdTimer = null;
+    let holdStartTime = null;
+    
+    const startHold = (e) => {
+        e.preventDefault();
+        if (holdTimer) return;
+        
+        holdStartTime = Date.now();
+        
+        // Start progress animation
+        if (progressElement) {
+            progressElement.classList.add('active');
+        }
+        
+        holdTimer = setTimeout(() => {
+            // Unlock after 3 seconds
+            state.touchGuardActive = false;
+            state.settings.touchGuardEnabled = false;
+            saveSettings();
+            updateTouchGuardUI();
+            
+            // Reset progress
+            if (progressElement) {
+                progressElement.classList.remove('active');
+            }
+            
+            holdTimer = null;
+            holdStartTime = null;
+        }, 3000);
+    };
+    
+    const cancelHold = () => {
+        if (holdTimer) {
+            clearTimeout(holdTimer);
+            holdTimer = null;
+        }
+        
+        if (progressElement) {
+            progressElement.classList.remove('active');
+        }
+        
+        holdStartTime = null;
+    };
+    
+    // Touch events
+    lockElement.addEventListener('touchstart', startHold, { passive: false });
+    lockElement.addEventListener('touchend', cancelHold);
+    lockElement.addEventListener('touchcancel', cancelHold);
+    lockElement.addEventListener('touchmove', cancelHold);
+    
+    // Mouse events (for desktop testing)
+    lockElement.addEventListener('mousedown', startHold);
+    lockElement.addEventListener('mouseup', cancelHold);
+    lockElement.addEventListener('mouseleave', cancelHold);
+}
+
+// ============================================
+// PROXIMITY SENSOR (Auto-enable touch guard)
+// ============================================
+
+// Note: Proximity Sensor API is not widely supported in web browsers.
+// This is experimental and only works on some devices/browsers.
+if ('ProximitySensor' in window) {
+    try {
+        const sensor = new ProximitySensor();
+        sensor.addEventListener('reading', () => {
+            // If proximity is near (object close to sensor), enable touch guard
+            if (sensor.near && !state.touchGuardActive) {
+                state.settings.touchGuardEnabled = true;
+                state.touchGuardActive = true;
+                saveSettings();
+                updateTouchGuardUI();
+            }
+        });
+        sensor.start();
+    } catch (error) {
+        console.log('Proximity Sensor not available:', error);
+    }
+} else {
+    console.log('Proximity Sensor API not supported in this browser');
+}
 
 // ============================================
 // CONNECTION STATUS
