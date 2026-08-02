@@ -406,6 +406,7 @@ function handleWSMessage(event) {
                 renderCueGrid();
                 break;
             case 'admin_settings':
+                console.log('Received admin settings:', message.settings);
                 state.adminSettings = message.settings;
                 renderUsersList(); // Re-render to update clickability
                 break;
@@ -787,6 +788,8 @@ async function handleCustomMessageReceived(message) {
 function renderUsersList() {
     DOM.usersList.innerHTML = '';
     
+    console.log('Rendering users list, privateMessagesEnabled:', state.adminSettings.privateMessagesEnabled);
+    
     state.users.forEach(user => {
         const item = document.createElement('div');
         item.className = 'user-item';
@@ -812,11 +815,13 @@ function renderUsersList() {
         // Make clickable to open private message dialog only if enabled
         if (state.adminSettings.privateMessagesEnabled) {
             item.addEventListener('click', () => {
+                console.log('User clicked, opening private message dialog for:', user.username);
                 openPrivateMessageDialog(user.username);
             });
         } else {
             item.style.cursor = 'not-allowed';
             item.style.opacity = '0.5';
+            console.log('Private messages disabled, user not clickable');
         }
         
         DOM.usersList.appendChild(item);
