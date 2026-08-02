@@ -407,7 +407,7 @@ function handleWSMessage(event) {
                 break;
             case 'admin_settings':
                 console.log('Received admin settings:', message.settings);
-                state.adminSettings = message.settings;
+                state.adminSettings.privateMessagesEnabled = message.settings.private_messages_enabled;
                 renderUsersList(); // Re-render to update clickability
                 break;
             default:
