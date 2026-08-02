@@ -167,7 +167,7 @@ function setupEventListeners() {
         DOM.menuUsers.addEventListener('click', () => {
             DOM.menuDropdown.classList.add('hidden');
             openModal(DOM.usersPanel);
-            loadUsers();
+            renderUsersList();
         });
     }
     
@@ -1162,6 +1162,8 @@ function sendPrivateMessage() {
     const message = DOM.privateMessageInput.value.trim();
     const recipient = DOM.privateMessageRecipient.textContent;
     
+    console.log('Sending private message:', { recipient, message });
+    
     if (!message) {
         alert('Please enter a message');
         return;
@@ -1178,6 +1180,8 @@ function sendPrivateMessage() {
         recipient: recipient,
         message: message
     });
+    
+    console.log('Private message sent');
     
     // Clear and close
     DOM.privateMessageInput.value = '';
