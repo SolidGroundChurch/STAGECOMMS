@@ -277,7 +277,7 @@
             <div class="stat">                <div class="stat-value" id="total-messages">0</div>
                 <div class="stat-label">Total Messages</div>
             </div>
-            <div class="stat-card">                <div class="stat-value" id="active-users">0</div>
+            <div class="stat">                <div class="stat-value" id="active-users">0</div>
                 <div class="stat-label">Active Users</div>
             </div>
         </div>
@@ -303,10 +303,8 @@
                     </div>
                     <div class="form-group">
                         <label>Button Colour</label>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <input type="color" id="cue-colour" value="#3B82F6">
-                            <span class="color-preview" id="colour-preview"></span>
-                        </div>
+                        <input type="color" id="cue-colour" value="#3B82F6" style="display: none;">
+                        <span class="color-preview" id="colour-preview" style="cursor: pointer;"></span>
                     </div>
                     <div class="form-group">
                         <label>Icon</label>
@@ -795,6 +793,11 @@
 
         document.getElementById('cue-colour').addEventListener('input', (e) => {
             document.getElementById('colour-preview').style.backgroundColor = e.target.value;
+        });
+
+        // Make colour preview clickable to open color picker
+        document.getElementById('colour-preview').addEventListener('click', () => {
+            document.getElementById('cue-colour').click();
         });
 
         // Initialize
