@@ -406,19 +406,21 @@ async function renderCueGrid() {
     // Get selected category filter
     const selectedCategory = DOM.categoryFilter ? DOM.categoryFilter.value : '';
     
-    // Filter cues by category
-    let filteredCues = selectedCategory 
-        ? state.cues.filter(cue => cue.category === selectedCategory)
-        : state.cues;
-    
-    // Separate utility cues (case-insensitive comparison)
-    const utilityCues = filteredCues.filter(cue => {
+    // Get utility cues (always included)
+    const utilityCues = state.cues.filter(cue => {
         const category = (cue.category || '').trim().toLowerCase();
         return category === 'utility';
     });
-    const otherCues = filteredCues.filter(cue => {
+    
+    // Filter non-utility cues by category
+    let otherCues = state.cues.filter(cue => {
         const category = (cue.category || '').trim().toLowerCase();
-        return category !== 'utility';
+        if (category === 'utility') return false;
+        
+        if (selectedCategory) {
+            return cue.category === selectedCategory;
+        }
+        return true;
     });
     
     // Render non-utility cues first
@@ -437,19 +439,21 @@ async function renderCueGrid() {
 function filterCuesByCategory() {
     const selectedCategory = DOM.categoryFilter ? DOM.categoryFilter.value : '';
     
-    // Filter cues by category
-    let filteredCues = selectedCategory 
-        ? state.cues.filter(cue => cue.category === selectedCategory)
-        : state.cues;
-    
-    // Separate utility cues (case-insensitive comparison)
-    const utilityCues = filteredCues.filter(cue => {
+    // Get utility cues (always included)
+    const utilityCues = state.cues.filter(cue => {
         const category = (cue.category || '').trim().toLowerCase();
         return category === 'utility';
     });
-    const otherCues = filteredCues.filter(cue => {
+    
+    // Filter non-utility cues by category
+    let otherCues = state.cues.filter(cue => {
         const category = (cue.category || '').trim().toLowerCase();
-        return category !== 'utility';
+        if (category === 'utility') return false;
+        
+        if (selectedCategory) {
+            return cue.category === selectedCategory;
+        }
+        return true;
     });
     
     // Re-render cue grid

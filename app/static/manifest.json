@@ -11,7 +11,7 @@
   "categories": ["productivity"],
   "icons": [
     {
-      "src": "/static/favicon.svg",
+      "src": "/static/app_logo.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
