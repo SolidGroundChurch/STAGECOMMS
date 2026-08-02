@@ -184,6 +184,43 @@
             </div>
         </div>
 
+        <!-- Private Message Dialog -->
+        <div id="private-message-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Private Message</h2>
+                    <button class="btn btn-icon close-btn">×</button>
+                </div>
+                <div class="private-message-info">
+                    <span>To: </span>
+                    <span id="private-message-recipient" class="recipient-name"></span>
+                </div>
+                <div style="position: relative;">
+                    <textarea 
+                        id="private-message-input" 
+                        placeholder="Type your private message..." 
+                        maxlength="500"
+                        rows="4"
+                    ></textarea>
+                    
+                    <!-- Touch Guard Overlay for Private Message -->
+                    <div id="touch-guard-private-message" class="touch-guard-overlay hidden">
+                        <div class="touch-guard-lock">
+                            <span class="touch-guard-icon">🔒</span>
+                            <span class="touch-guard-text">Hold to Unlock</span>
+                            <div class="touch-guard-progress"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="char-count">
+                    <span id="private-message-char-count">0</span>/500
+                </div>
+                <button id="send-private-btn" class="btn btn-primary">
+                    Send
+                </button>
+            </div>
+        </div>
+
         <!-- Settings Panel -->
         <div id="settings-modal" class="modal hidden">
             <div class="modal-content">

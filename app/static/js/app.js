@@ -69,6 +69,12 @@ const DOM = {
     lockIcon: document.getElementById('lock-icon'),
     touchGuardCueGrid: document.getElementById('touch-guard-cue-grid'),
     touchGuardCustomMessage: document.getElementById('touch-guard-custom-message'),
+    touchGuardPrivateMessage: document.getElementById('touch-guard-private-message'),
+    privateMessageModal: document.getElementById('private-message-modal'),
+    privateMessageRecipient: document.getElementById('private-message-recipient'),
+    privateMessageInput: document.getElementById('private-message-input'),
+    privateMessageCharCount: document.getElementById('private-message-char-count'),
+    sendPrivateBtn: document.getElementById('send-private-btn'),
     cueOverlay: document.getElementById('cue-overlay'),
     overlayMessage: document.getElementById('overlay-message'),
     overlaySender: document.getElementById('overlay-sender'),
@@ -197,6 +203,15 @@ function setupEventListeners() {
     if (DOM.touchGuardCustomMessage) {
         setupTouchGuardUnlock(DOM.touchGuardCustomMessage);
     }
+    
+    // Touch guard unlock (private message)
+    if (DOM.touchGuardPrivateMessage) {
+        setupTouchGuardUnlock(DOM.touchGuardPrivateMessage);
+    }
+    
+    // Private message
+    DOM.privateMessageInput.addEventListener('input', updatePrivateMessageCharCount);
+    DOM.sendPrivateBtn.addEventListener('click', sendPrivateMessage);
     
     // Close menu when clicking outside
     document.addEventListener('click', (e) => {
@@ -366,6 +381,9 @@ function handleWSMessage(event) {
                 break;
             case 'custom_message':
                 handleCustomMessageReceived(message);
+                break;
+            case 'private_message':
+                handleCustomMessageReceived(message); // Handle same as custom message for now
                 break;
             case 'user_connected':
                 addUserToList(message.username);
@@ -766,6 +784,9 @@ function renderUsersList() {
         const item = document.createElement('div');
         item.className = 'user-item';
         
+        // Skip current user
+        if (user.username === state.username) return;
+        
         const name = document.createElement('span');
         name.className = 'user-name';
         name.textContent = user.username;
@@ -780,6 +801,12 @@ function renderUsersList() {
         item.appendChild(dot);
         item.appendChild(name);
         item.appendChild(time);
+        
+        // Make clickable to open private message dialog
+        item.addEventListener('click', () => {
+            openPrivateMessageDialog(user.username);
+        });
+        
         DOM.usersList.appendChild(item);
     });
 }
@@ -1032,6 +1059,14 @@ function updateTouchGuardUI() {
             DOM.touchGuardCustomMessage.classList.add('hidden');
         }
     }
+    
+    if (DOM.touchGuardPrivateMessage) {
+        if (state.touchGuardActive) {
+            DOM.touchGuardPrivateMessage.classList.remove('hidden');
+        } else {
+            DOM.touchGuardPrivateMessage.classList.add('hidden');
+        }
+    }
 }
 
 function setupTouchGuardUnlock(overlay) {
@@ -1091,6 +1126,51 @@ function setupTouchGuardUnlock(overlay) {
     lockElement.addEventListener('mousedown', startHold);
     lockElement.addEventListener('mouseup', cancelHold);
     lockElement.addEventListener('mouseleave', cancelHold);
+}
+
+// ============================================
+// PRIVATE MESSAGES
+// ============================================
+
+function openPrivateMessageDialog(recipient) {
+    DOM.privateMessageRecipient.textContent = recipient;
+    DOM.privateMessageInput.value = '';
+    DOM.privateMessageCharCount.textContent = '0';
+    closeModal(DOM.usersPanel);
+    openModal(DOM.privateMessageModal);
+    DOM.privateMessageInput.focus();
+}
+
+function updatePrivateMessageCharCount() {
+    const count = DOM.privateMessageInput.value.length;
+    DOM.privateMessageCharCount.textContent = count;
+}
+
+function sendPrivateMessage() {
+    const message = DOM.privateMessageInput.value.trim();
+    const recipient = DOM.privateMessageRecipient.textContent;
+    
+    if (!message) {
+        alert('Please enter a message');
+        return;
+    }
+    
+    if (!recipient) {
+        alert('No recipient selected');
+        return;
+    }
+    
+    // Send via WebSocket
+    sendWebSocketMessage({
+        type: 'private_message',
+        recipient: recipient,
+        message: message
+    });
+    
+    // Clear and close
+    DOM.privateMessageInput.value = '';
+    DOM.privateMessageCharCount.textContent = '0';
+    closeModal(DOM.privateMessageModal);
 }
 
 // ============================================

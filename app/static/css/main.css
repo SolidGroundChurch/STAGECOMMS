@@ -996,6 +996,44 @@ html, body {
 }
 
 /* ============================================
+   PRIVATE MESSAGE STYLES
+   ============================================ */
+
+.private-message-info {
+    padding: 1rem;
+    background: var(--dark-surface);
+    border-radius: var(--border-radius);
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.recipient-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: var(--dark-surface);
+    border-radius: var(--border-radius);
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: background-color var(--transition);
+}
+
+.user-item:hover {
+    background: var(--dark-border);
+}
+
+.user-item:active {
+    background: var(--primary-color);
+}
+
+/* ============================================
    PRINT STYLES
    ============================================ */
 

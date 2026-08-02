@@ -174,6 +174,26 @@ async def websocket_endpoint(websocket: WebSocket, username: str, db: Session = 
                         category="custom",
                     )
 
+            elif message_type == "private_message":
+                # Send private message to specific recipient
+                recipient = data.get("recipient", "").strip()
+                text = data.get("message", "").strip()
+                
+                if recipient and text and len(text) <= 500:
+                    private_msg = WebSocketHandler.create_custom_message(
+                        message_text=f"[Private] {text}",
+                        username=username,
+                    )
+                    # Send only to the recipient
+                    await manager.send_to_user(recipient, private_msg)
+                    
+                    # Also send confirmation to sender
+                    confirmation_msg = WebSocketHandler.create_custom_message(
+                        message_text=f"[Private to {recipient}] {text}",
+                        username=username,
+                    )
+                    await manager.send_to_user(username, confirmation_msg)
+
     except Exception as e:
         logger.error(f"WebSocket error for {username}: {e}")
 

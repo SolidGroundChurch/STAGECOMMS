@@ -82,6 +82,34 @@ class ConnectionManager:
             logger.error(f"Error sending personal message: {e}")
             return False
 
+    async def send_to_user(self, username: str, message: Dict[str, Any]) -> bool:
+        """Send message to all connections for a specific user."""
+        if username not in self.active_connections:
+            logger.warning(f"User '{username}' not connected")
+            return False
+        
+        disconnected = []
+        success = False
+        
+        for connection in self.active_connections[username][:]:  # Copy list
+            try:
+                await connection.send_json(message)
+                success = True
+            except Exception as e:
+                logger.error(f"Error sending to {username}: {e}")
+                disconnected.append(connection)
+        
+        # Clean up disconnected connections
+        for connection in disconnected:
+            try:
+                self.active_connections[username].remove(connection)
+                if not self.active_connections[username]:
+                    del self.active_connections[username]
+            except ValueError:
+                pass
+        
+        return success
+
     def get_connected_users(self) -> List[str]:
         """Get list of currently connected usernames."""
         return list(self.active_connections.keys())
