@@ -390,6 +390,12 @@
         <!-- System -->
         <div class="section">
             <h2>System</h2>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="private-messages-enabled" checked>
+                    Enable Private Messages
+                </label>
+            </div>
             <div class="button-group">
                 <button class="btn-secondary" onclick="checkHealth()">Check Health</button>
                 <button class="btn-secondary" onclick="refreshStats()">Refresh Stats</button>
@@ -794,8 +800,41 @@
             }
         }
 
+        async function loadSettings() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/settings`);
+                if (response.ok) {
+                    const settings = await response.json();
+                    document.getElementById('private-messages-enabled').checked = settings.private_messages_enabled;
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
         document.getElementById('cue-colour').addEventListener('input', (e) => {
             document.getElementById('colour-preview').style.backgroundColor = e.target.value;
+        });
+
+        // Private messages toggle
+        document.getElementById('private-messages-enabled').addEventListener('change', async (e) => {
+            const enabled = e.target.checked;
+            try {
+                const response = await fetch(`${API_BASE}/admin/settings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ private_messages_enabled: enabled })
+                });
+                if (response.ok) {
+                    showMessage('Private messages setting updated', 'success');
+                } else {
+                    showMessage('Failed to update setting', 'error');
+                    e.target.checked = !enabled; // Revert
+                }
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+                e.target.checked = !enabled; // Revert
+            }
         });
 
         // Initialize
@@ -804,6 +843,7 @@
             loadStats();
             loadCues();
             loadUsers();
+            loadSettings();
 
             // Refresh every 30 seconds
             setInterval(() => {

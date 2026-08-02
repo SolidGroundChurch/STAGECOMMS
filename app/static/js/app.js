@@ -44,6 +44,9 @@ const state = {
         touchGuardEnabled: false,
     },
     touchGuardActive: false,
+    adminSettings: {
+        privateMessagesEnabled: true,
+    },
 };
 
 // ============================================
@@ -401,6 +404,10 @@ function handleWSMessage(event) {
                 state.cues = message.cues;
                 loadCategories();
                 renderCueGrid();
+                break;
+            case 'admin_settings':
+                state.adminSettings = message.settings;
+                renderUsersList(); // Re-render to update clickability
                 break;
             default:
                 console.log('Unknown message type:', message.type);
@@ -802,10 +809,15 @@ function renderUsersList() {
         item.appendChild(name);
         item.appendChild(time);
         
-        // Make clickable to open private message dialog
-        item.addEventListener('click', () => {
-            openPrivateMessageDialog(user.username);
-        });
+        // Make clickable to open private message dialog only if enabled
+        if (state.adminSettings.privateMessagesEnabled) {
+            item.addEventListener('click', () => {
+                openPrivateMessageDialog(user.username);
+            });
+        } else {
+            item.style.cursor = 'not-allowed';
+            item.style.opacity = '0.5';
+        }
         
         DOM.usersList.appendChild(item);
     });

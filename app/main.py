@@ -11,6 +11,7 @@ from app.backend.database import seed_default_cues
 from app.backend.websocket import ConnectionManager, WebSocketHandler
 from app.backend.services import UserService, MessageService, CueService
 from app.backend.api.routes import health, cues, users, messages, admin
+from app.backend.api.routes.admin import load_admin_settings
 from app.backend.models import Cue, User, Message
 
 # Configure logging
@@ -118,6 +119,14 @@ async def websocket_endpoint(websocket: WebSocket, username: str, db: Session = 
         cues_msg = WebSocketHandler.create_cues_list_message(cues_list)
         await manager.send_personal(websocket, cues_msg)
 
+        # Send admin settings to the connecting client
+        admin_settings = load_admin_settings()
+        settings_msg = {
+            "type": "admin_settings",
+            "settings": admin_settings
+        }
+        await manager.send_personal(websocket, settings_msg)
+
         # Keep connection alive and handle incoming messages
         while True:
             data = await websocket.receive_json()
@@ -178,6 +187,17 @@ async def websocket_endpoint(websocket: WebSocket, username: str, db: Session = 
                 # Send private message to specific recipient
                 recipient = data.get("recipient", "").strip()
                 text = data.get("message", "").strip()
+                
+                # Check if private messages are enabled
+                admin_settings = load_admin_settings()
+                if not admin_settings.get("private_messages_enabled", True):
+                    # Send error message back to sender
+                    error_msg = WebSocketHandler.create_custom_message(
+                        message_text="Private messages are disabled by admin",
+                        username="System",
+                    )
+                    await manager.send_to_user(username, error_msg)
+                    continue
                 
                 if recipient and text and len(text) <= 500:
                     private_msg = WebSocketHandler.create_custom_message(

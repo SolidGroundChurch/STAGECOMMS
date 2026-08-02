@@ -8,6 +8,7 @@ from app.backend.services import CueService, MessageService
 from app.backend.config import settings
 from pydantic import BaseModel
 import os
+import json
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -18,6 +19,37 @@ class AdminStats(BaseModel):
     enabled_cues: int
     total_messages: int
     categories: List[str]
+
+
+class AdminSettings(BaseModel):
+    """Admin settings."""
+    private_messages_enabled: bool
+
+
+def get_settings_file():
+    """Get path to settings file."""
+    return settings.DATABASE_DIR / "admin_settings.json"
+
+
+def load_admin_settings():
+    """Load admin settings from file."""
+    settings_file = get_settings_file()
+    if settings_file.exists():
+        try:
+            with open(settings_file, 'r') as f:
+                return json.load(f)
+        except Exception:
+            pass
+    # Default settings
+    return {"private_messages_enabled": True}
+
+
+def save_admin_settings(settings_data):
+    """Save admin settings to file."""
+    settings_file = get_settings_file()
+    settings_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(settings_file, 'w') as f:
+        json.dump(settings_data, f)
 
 
 @router.get("/stats", response_model=AdminStats)
@@ -67,3 +99,19 @@ async def admin_health_check():
         "status": "ok",
         "admin_interface": "available",
     }
+
+
+@router.get("/settings", response_model=AdminSettings)
+async def get_admin_settings():
+    """Get admin settings."""
+    settings_data = load_admin_settings()
+    return AdminSettings(**settings_data)
+
+
+@router.post("/settings", response_model=AdminSettings)
+async def update_admin_settings(settings_update: AdminSettings):
+    """Update admin settings."""
+    current_settings = load_admin_settings()
+    current_settings.update(settings_update.dict())
+    save_admin_settings(current_settings)
+    return AdminSettings(**current_settings)
