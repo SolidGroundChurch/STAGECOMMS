@@ -39,15 +39,19 @@ class WebSocketHandler:
         message_text: str,
         username: str,
         audio_mode: str = AudioMode.TTS_ONLY.value,
+        tts_text: str = None,
     ) -> Dict[str, Any]:
         """Create a custom message broadcast."""
-        return {
+        message = {
             "type": "custom_message",
             "message_text": message_text,
             "username": username,
             "audio_mode": audio_mode,
             "timestamp": datetime.utcnow().isoformat(),
         }
+        if tts_text:
+            message["tts_text"] = tts_text
+        return message
 
     @staticmethod
     def create_user_connected_message(username: str) -> Dict[str, Any]:

@@ -1021,14 +1021,15 @@ html, body {
 #private-message-input {
     width: 100%;
     padding: 1rem;
-    background: var(--dark-surface);
-    border: 1px solid var(--dark-border);
+    border: 2px solid var(--dark-border);
     border-radius: var(--border-radius);
+    background: var(--dark-bg);
     color: var(--text-primary);
     font-size: 1rem;
     font-family: inherit;
-    resize: vertical;
-    transition: border-color var(--transition);
+    resize: none;
+    margin-bottom: 0.5rem;
+    min-height: 3.5rem;
 }
 
 #private-message-input:focus {

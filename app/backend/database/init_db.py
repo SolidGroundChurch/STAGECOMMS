@@ -20,7 +20,9 @@ def seed_default_cues(force: bool = False):
     try:
         # Check if cues already exist
         existing = CueService.get_all_cues(db, enabled_only=False)
-        if existing and not force:
+        
+        # Only skip if we have all the default cues (19 cues)
+        if existing and not force and len(existing) >= 19:
             print(f"Database already has {len(existing)} cues, skipping seed data")
             return
         
@@ -31,7 +33,7 @@ def seed_default_cues(force: bool = False):
                 db.delete(cue)
             db.commit()
         
-        print("No cues found in database, seeding default cues...")
+        print("Seeding default cues...")
 
         # Default cues from spreadsheet
         default_cues = [
