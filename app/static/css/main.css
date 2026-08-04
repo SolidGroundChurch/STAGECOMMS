@@ -1018,6 +1018,28 @@ html, body {
     color: var(--text-primary);
 }
 
+#private-message-input {
+    width: 100%;
+    padding: 1rem;
+    background: var(--dark-surface);
+    border: 1px solid var(--dark-border);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color var(--transition);
+}
+
+#private-message-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+#private-message-input::placeholder {
+    color: var(--text-secondary);
+}
+
 .user-item {
     display: flex;
     align-items: center;

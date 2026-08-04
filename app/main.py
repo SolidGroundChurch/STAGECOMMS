@@ -62,6 +62,17 @@ app.include_router(messages.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
 
 
+# Root-level health check for Portainer and other monitoring tools
+@app.get("/health")
+async def root_health_check():
+    """Root-level health check for container orchestration tools."""
+    return {
+        "status": "ok",
+        "version": settings.APP_VERSION,
+        "app_name": settings.APP_NAME,
+    }
+
+
 @app.get("/")
 async def root():
     """Serve index.html."""
@@ -200,17 +211,21 @@ async def websocket_endpoint(websocket: WebSocket, username: str, db: Session = 
                     continue
                 
                 if recipient and text and len(text) <= 500:
+                    # Add TTS prefix with pause for recipient
+                    private_tts = f"Private message from {username}. <break time='500ms'/> {text}"
                     private_msg = WebSocketHandler.create_custom_message(
                         message_text=f"[Private] {text}",
                         username=username,
+                        tts_text=private_tts,
                     )
                     # Send only to the recipient
                     await manager.send_to_user(recipient, private_msg)
                     
-                    # Also send confirmation to sender
+                    # Also send confirmation to sender (no TTS for confirmation)
                     confirmation_msg = WebSocketHandler.create_custom_message(
                         message_text=f"[Private to {recipient}] {text}",
                         username=username,
+                        tts_text=None,  # No TTS for sender confirmation
                     )
                     await manager.send_to_user(username, confirmation_msg)
 
