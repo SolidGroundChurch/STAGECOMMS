@@ -361,6 +361,11 @@ html, body {
     flex-shrink: 0;
 }
 
+.last-cue.private-message {
+    background: rgba(239, 68, 68, 0.2);
+    border-bottom: 1px solid rgba(239, 68, 68, 0.5);
+}
+
 #last-cue-content {
     font-size: 0.875rem;
     color: var(--text-secondary);
@@ -368,6 +373,10 @@ html, body {
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.4;
+}
+
+.last-cue.private-message #last-cue-content {
+    color: #fca5a5;
 }
 
 .status-dot {
@@ -471,6 +480,10 @@ html, body {
     animation: fadeIn 0.3s ease-out;
 }
 
+.cue-overlay.private-message {
+    background: rgba(127, 29, 29, 0.95);
+}
+
 .cue-overlay.hidden {
     display: none;
 }
@@ -486,6 +499,10 @@ html, body {
     margin-bottom: 1rem;
     color: var(--primary-color);
     text-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.cue-overlay.private-message h1 {
+    color: #fca5a5;
 }
 
 .sender-info {
@@ -668,6 +685,12 @@ html, body {
     border: 2px solid var(--dark-border);
     border-radius: var(--border-radius);
     border-left: 4px solid var(--primary-color);
+}
+
+.history-item.private-message {
+    background: rgba(127, 29, 29, 0.15);
+    border-color: rgba(239, 68, 68, 0.5);
+    border-left: 4px solid #ef4444;
 }
 
 .history-header {

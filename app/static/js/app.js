@@ -214,6 +214,15 @@ function setupEventListeners() {
     
     // Private message
     DOM.privateMessageInput.addEventListener('input', updatePrivateMessageCharCount);
+    
+    // Enter key to send private message
+    DOM.privateMessageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendPrivateMessage();
+        }
+    });
+    
     DOM.sendPrivateBtn.addEventListener('click', sendPrivateMessage);
     
     // Close menu when clicking outside
@@ -239,6 +248,15 @@ function setupEventListeners() {
         }
         DOM.tempMessageCharCount.textContent = `${count}/500`;
     });
+    
+    // Enter key to send temporary message
+    DOM.temporaryMessageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendTemporaryMessage();
+        }
+    });
+    
     DOM.sendTemporaryMessageBtn.addEventListener('click', sendTemporaryMessage);
 
     // History controls
@@ -247,6 +265,15 @@ function setupEventListeners() {
     DOM.historySearch.addEventListener('input', filterHistory);
     DOM.historyFilterUser.addEventListener('change', filterHistory);
     DOM.historyFilterCategory.addEventListener('change', filterHistory);
+
+    // Click on last-cue to open message history
+    if (DOM.lastCueContent) {
+        DOM.lastCueContent.closest('.last-cue').addEventListener('click', () => {
+            openModal(DOM.historyPanel);
+            loadHistory();
+        });
+        DOM.lastCueContent.closest('.last-cue').style.cursor = 'pointer';
+    }
 
     // Modals
     document.querySelectorAll('.close-btn').forEach(btn => {
@@ -280,6 +307,26 @@ function setupEventListeners() {
     });
 
     DOM.logoutBtn.addEventListener('click', logout);
+    
+    // Release touch lock on page close/reload
+    window.addEventListener('beforeunload', () => {
+        if (state.touchGuardActive) {
+            state.touchGuardActive = false;
+            state.settings.touchGuardEnabled = false;
+            saveSettings();
+        }
+    });
+    
+    // Also release on visibility change (app background/foreground)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && state.touchGuardActive) {
+            // App came back to foreground, release lock
+            state.touchGuardActive = false;
+            state.settings.touchGuardEnabled = false;
+            saveSettings();
+            updateTouchGuardUI();
+        }
+    });
 
     // Close modals on backdrop click
     document.querySelectorAll('.modal').forEach(modal => {
@@ -608,19 +655,34 @@ async function handleCueMessage(message) {
     await playAudio(message);
 }
 
-function updateBanner(message) {
+function updateBanner(message, isPrivateMessage = false) {
     const sender = message.username || 'System';
     const text = message.display_name || message.message_text;
     DOM.lastCueContent.innerHTML = `<strong>${sender}</strong> says:<br>${text}`;
+    
+    // Apply private message styling
+    if (isPrivateMessage) {
+        DOM.lastCueContent.closest('.last-cue').classList.add('private-message');
+    } else {
+        DOM.lastCueContent.closest('.last-cue').classList.remove('private-message');
+    }
 }
 
-function showCueOverlay(message) {
+function showCueOverlay(message, isPrivateMessage = false) {
     DOM.overlayMessage.textContent = message.display_name || message.message_text;
     DOM.overlaySender.textContent = `${message.username} says...`;
     DOM.cueOverlay.classList.remove('hidden');
     
+    // Apply private message styling
+    if (isPrivateMessage) {
+        DOM.cueOverlay.classList.add('private-message');
+    } else {
+        DOM.cueOverlay.classList.remove('private-message');
+    }
+    
     setTimeout(() => {
         DOM.cueOverlay.classList.add('hidden');
+        DOM.cueOverlay.classList.remove('private-message');
     }, CONFIG.CUE_OVERLAY_DURATION);
 }
 
@@ -772,10 +834,13 @@ async function sendTemporaryMessage() {
 }
 
 async function handleCustomMessageReceived(message) {
-    updateBanner(message);
+    // Check if this is a private message
+    const isPrivateMessage = message.message_text && message.message_text.startsWith('[Private');
+    
+    updateBanner(message, isPrivateMessage);
     
     if (state.settings.fullScreenCues) {
-        showCueOverlay(message);
+        showCueOverlay(message, isPrivateMessage);
     }
     
     await playAudio(message);
@@ -899,6 +964,11 @@ function renderHistory(messages) {
     messages.reverse().forEach(msg => {
         const item = document.createElement('div');
         item.className = 'history-item';
+        
+        // Check if this is a private message
+        if (msg.message_text && msg.message_text.startsWith('[Private')) {
+            item.classList.add('private-message');
+        }
         
         const header = document.createElement('div');
         header.className = 'history-header';
@@ -1091,12 +1161,23 @@ function setupTouchGuardUnlock(overlay) {
     const progressElement = overlay.querySelector('.touch-guard-progress');
     let holdTimer = null;
     let holdStartTime = null;
+    let startTouchY = null;
+    let startTouchX = null;
     
     const startHold = (e) => {
         e.preventDefault();
         if (holdTimer) return;
         
         holdStartTime = Date.now();
+        
+        // Record initial touch position for movement threshold
+        if (e.touches && e.touches[0]) {
+            startTouchY = e.touches[0].clientY;
+            startTouchX = e.touches[0].clientX;
+        } else {
+            startTouchY = e.clientY;
+            startTouchX = e.clientX;
+        }
         
         // Start progress animation
         if (progressElement) {
@@ -1117,10 +1198,32 @@ function setupTouchGuardUnlock(overlay) {
             
             holdTimer = null;
             holdStartTime = null;
+            startTouchY = null;
+            startTouchX = null;
         }, 3000);
     };
     
-    const cancelHold = () => {
+    const cancelHold = (e) => {
+        // Check if movement is within threshold (50px)
+        if (e.type === 'touchmove' || e.type === 'mousemove') {
+            let currentY, currentX;
+            if (e.touches && e.touches[0]) {
+                currentY = e.touches[0].clientY;
+                currentX = e.touches[0].clientX;
+            } else {
+                currentY = e.clientY;
+                currentX = e.clientX;
+            }
+            
+            const deltaY = Math.abs(currentY - startTouchY);
+            const deltaX = Math.abs(currentX - startTouchX);
+            
+            // Allow movement within 50px threshold
+            if (deltaY < 50 && deltaX < 50) {
+                return; // Don't cancel, movement is within threshold
+            }
+        }
+        
         if (holdTimer) {
             clearTimeout(holdTimer);
             holdTimer = null;
@@ -1131,15 +1234,23 @@ function setupTouchGuardUnlock(overlay) {
         }
         
         holdStartTime = null;
+        startTouchY = null;
+        startTouchX = null;
     };
     
-    // Touch events
+    // Use pointer events for better cross-device support
+    lockElement.addEventListener('pointerdown', startHold);
+    lockElement.addEventListener('pointerup', cancelHold);
+    lockElement.addEventListener('pointercancel', cancelHold);
+    lockElement.addEventListener('pointerleave', cancelHold);
+    lockElement.addEventListener('pointermove', cancelHold);
+    
+    // Fallback to touch events for older browsers
     lockElement.addEventListener('touchstart', startHold, { passive: false });
     lockElement.addEventListener('touchend', cancelHold);
     lockElement.addEventListener('touchcancel', cancelHold);
-    lockElement.addEventListener('touchmove', cancelHold);
     
-    // Mouse events (for desktop testing)
+    // Fallback to mouse events
     lockElement.addEventListener('mousedown', startHold);
     lockElement.addEventListener('mouseup', cancelHold);
     lockElement.addEventListener('mouseleave', cancelHold);
