@@ -14,6 +14,7 @@ const CONFIG = {
     HEARTBEAT_INTERVAL: 30000, // 30 seconds
     CUE_OVERLAY_DURATION: 3000, // 3 seconds
     AUDIO_PRELOAD_TIMEOUT: 10000, // 10 seconds
+    APP_VERSION: '1.0',
 };
 
 const AUDIO_MODES = {
@@ -100,6 +101,8 @@ const DOM = {
     notificationVolumeInput: document.getElementById('notification-volume'),
     logoutBtn: document.getElementById('logout-btn'),
     loadingSpinner: document.getElementById('loading-spinner'),
+    appVersion: document.getElementById('app-version'),
+    checkUpdatesBtn: document.getElementById('check-updates-btn'),
     temporaryMessageInput: document.getElementById('temporary-message-input'),
     sendTemporaryMessageBtn: document.getElementById('send-temporary-message-btn'),
     historyLast24hBtn: document.getElementById('history-last-24h-btn'),
@@ -116,6 +119,11 @@ const DOM = {
 document.addEventListener('DOMContentLoaded', () => {
     loadSettings();
     setupEventListeners();
+    
+    // Set app version
+    if (DOM.appVersion) {
+        DOM.appVersion.textContent = CONFIG.APP_VERSION;
+    }
     
     const savedUsername = localStorage.getItem('stagecomms_username');
     if (savedUsername) {
@@ -307,6 +315,10 @@ function setupEventListeners() {
     });
 
     DOM.logoutBtn.addEventListener('click', logout);
+
+    if (DOM.checkUpdatesBtn) {
+        DOM.checkUpdatesBtn.addEventListener('click', checkForUpdates);
+    }
     
     // Release touch lock on page close/reload
     window.addEventListener('beforeunload', () => {
@@ -373,6 +385,44 @@ function logout() {
         state.messages = [];
         state.users = [];
         showLoginScreen();
+    }
+}
+
+async function checkForUpdates() {
+    if (!confirm('This will clear the app cache and reload the page to download the latest version. Continue?')) {
+        return;
+    }
+
+    try {
+        // Show loading indicator
+        if (DOM.loadingSpinner) {
+            DOM.loadingSpinner.classList.remove('hidden');
+        }
+
+        // Clear all caches using Cache Storage API
+        if ('caches' in window) {
+            const cacheNames = await caches.keys();
+            await Promise.all(
+                cacheNames.map(cacheName => caches.delete(cacheName))
+            );
+        }
+
+        // Clear service worker registration if exists
+        if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(
+                registrations.map(registration => registration.unregister())
+            );
+        }
+
+        // Reload the page to re-download everything
+        window.location.reload(true);
+    } catch (error) {
+        console.error('Error checking for updates:', error);
+        alert('Failed to clear cache. Please try again.');
+        if (DOM.loadingSpinner) {
+            DOM.loadingSpinner.classList.add('hidden');
+        }
     }
 }
 
